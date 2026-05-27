@@ -1,293 +1,95 @@
-import streamlit as st
 import random
 import time
 
-# =========================================
-# 페이지 설정
-# =========================================
-st.set_page_config(
-    page_title="🔫 MBTI VALORANT 에이전트 추천기 🔫",
-    page_icon="🎯",
-    layout="centered"
-)
+# ======================================
+# 플레이어 MBTI 선택
+# ======================================
+print("🎮 MBTI 포켓몬 배틀 게임!")
+print("당신의 MBTI를 입력하세요 (예: ENFP, INTJ 등)")
 
-# =========================================
-# CSS
-# =========================================
-st.markdown("""
-<style>
+mbti = input("👉 MBTI: ").upper()
 
-@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap');
-
-html, body, [class*="css"] {
-    font-family: 'Pretendard', sans-serif;
+# ======================================
+# 포켓몬 데이터
+# ======================================
+pokemon = {
+    "INTJ": "뮤츠 🧬",
+    "INFP": "이브이 🌸",
+    "ENFP": "피카츄 ⚡",
+    "ENTJ": "리자몽 🔥",
+    "INFJ": "루기아 🌊",
+    "ISTP": "한카리아스 🐉"
 }
 
-.main {
-    background: linear-gradient(to bottom, #0f172a, #111827);
-    color: white;
-}
+enemy = ["야생 팬텀 👻", "야생 리자몽 🔥", "야생 갸라도스 🌊", "야생 망나뇽 🐉"]
 
-.title {
-    text-align:center;
-    font-size:55px;
-    font-weight:900;
-    color:#ff4655;
-}
+# ======================================
+# 기본 값
+# ======================================
+hp = 100
+enemy_hp = 100
 
-.subtitle {
-    text-align:center;
-    font-size:22px;
-    color:#cbd5e1;
-    margin-bottom:30px;
-}
+player = pokemon.get(mbti, "피카츄 ⚡")
+wild = random.choice(enemy)
 
-.card {
-    background:#111827;
-    padding:30px;
-    border-radius:25px;
-    box-shadow:0px 10px 30px rgba(0,0,0,0.4);
-    color:white;
-}
+print("\n🎯 당신의 포켓몬:", player)
+print("⚔️ 상대:", wild)
 
-.stButton>button {
-    width:100%;
-    height:60px;
-    border:none;
-    border-radius:18px;
-    background:linear-gradient(to right,#ff4655,#ff7a59);
-    color:white;
-    font-size:22px;
-    font-weight:bold;
-}
+print("\n🔥 배틀 시작!")
 
-.stButton>button:hover {
-    background:linear-gradient(to right,#ff7a59,#ff4655);
-}
+# ======================================
+# 게임 루프
+# ======================================
+while hp > 0 and enemy_hp > 0:
 
-.rank {
-    padding:10px;
-    border-radius:15px;
-    background:linear-gradient(to right,#ff4655,#ffcc00);
-    text-align:center;
-    font-weight:bold;
-    color:black;
-}
+    print("\n====================")
+    print(f"❤️ 내 HP: {hp}")
+    print(f"💀 적 HP: {enemy_hp}")
+    print("====================")
 
-.footer {
-    text-align:center;
-    color:gray;
-    margin-top:50px;
-}
+    print("\n행동 선택:")
+    print("1️⃣ 공격")
+    print("2️⃣ 방어")
+    print("3️⃣ 회복")
 
-</style>
-""", unsafe_allow_html=True)
+    choice = input("👉 선택: ")
 
-# =========================================
-# 발로란트 데이터
-# =========================================
-agents = {
+    # 플레이어 행동
+    if choice == "1":
+        damage = random.randint(10, 25)
+        enemy_hp -= damage
+        print(f"🔥 공격 성공! {damage} 데미지!")
 
-    "INTJ": {
-        "name": "CHAMBER 🕶️",
-        "desc": "완벽한 계산형 킬러, 한 발로 끝내는 전략가",
-        "role": "센티넬",
-        "skill": "헤드헌터 🔫",
-        "tier": "👑 프로픽",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltb3b1c3f0c2f7b2a3/Chamber.png"
-    },
+    elif choice == "2":
+        block = random.randint(5, 15)
+        print(f"🛡️ 방어 자세! 피해 감소 효과 {block}")
 
-    "INTP": {
-        "name": "KILLJOY 🤖",
-        "desc": "기계처럼 분석하고 설계하는 방어 천재",
-        "role": "센티넬",
-        "skill": "나노스웜 💣",
-        "tier": "💎 전략형",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltb3a3f0c2f7b2a3/Killjoy.png"
-    },
+    elif choice == "3":
+        heal = random.randint(10, 20)
+        hp += heal
+        print(f"💖 회복! HP +{heal}")
 
-    "ENTJ": {
-        "name": "BRIMSTONE 🔥",
-        "desc": "팀을 지휘하는 완벽한 리더",
-        "role": "컨트롤러",
-        "skill": "궤도폭격 ☄️",
-        "tier": "🔥 지휘관",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltbrimstone.png"
-    },
+    else:
+        print("❌ 잘못된 입력!")
 
-    "ENTP": {
-        "name": "JETT 🌪️",
-        "desc": "예측 불가, 자유로운 공격 스타일",
-        "role": "듀얼리스트",
-        "skill": "칼날 대시 ⚡",
-        "tier": "💀 캐리형",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltjett.png"
-    },
+    # 적 공격
+    if enemy_hp > 0:
+        enemy_damage = random.randint(8, 20)
+        hp -= enemy_damage
+        print(f"💥 적의 공격! -{enemy_damage} HP")
 
-    "INFJ": {
-        "name": "SAGE 💚",
-        "desc": "팀을 살리는 조용한 수호자",
-        "role": "센티넬",
-        "skill": "부활 ✨",
-        "tier": "💖 필수픽",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltsage.png"
-    },
+    time.sleep(1)
 
-    "INFP": {
-        "name": "REYNA 💜",
-        "desc": "감정 기반 캐리형 솔로 플레이어",
-        "role": "듀얼리스트",
-        "skill": "영혼흡수 👁️",
-        "tier": "🌈 하이리스크",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltreyna.png"
-    },
+# ======================================
+# 결과
+# ======================================
+print("\n====================")
 
-    "ENFJ": {
-        "name": "SKYE 🌿",
-        "desc": "팀을 치유하고 이끄는 리더형 서포터",
-        "role": "이니시에이터",
-        "skill": "힐링 토템 🐺",
-        "tier": "💚 팀버프",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltskye.png"
-    },
+if hp > 0:
+    print("🏆 승리!")
+    print(f"🎉 {player}가 전투에서 승리했습니다!")
+else:
+    print("💀 패배...")
+    print("다음엔 더 강해지세요!")
 
-    "ENFP": {
-        "name": "PHOENIX 🔥",
-        "desc": "불같은 에너지, 혼자도 팀도 캐리",
-        "role": "듀얼리스트",
-        "skill": "리바이브 🔥",
-        "tier": "⚡ 인기픽",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltphoenix.png"
-    },
-
-    "ISTJ": {
-        "name": "CYpher 🕵️",
-        "desc": "정보를 완벽히 통제하는 분석가",
-        "role": "센티넬",
-        "skill": "트랩 와이어 🪤",
-        "tier": "🧠 정보형",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltcypher.png"
-    },
-
-    "ISFJ": {
-        "name": "SOVA 🏹",
-        "desc": "팀을 위해 정보를 수집하는 지원형",
-        "role": "이니시에이터",
-        "skill": "정찰 화살 🎯",
-        "tier": "💙 서포트",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltsova.png"
-    },
-
-    "ESTJ": {
-        "name": "BREACH 💥",
-        "desc": "강력한 진입형 파괴자",
-        "role": "이니시에이터",
-        "skill": "지진 충격 🌋",
-        "tier": "🔥 돌격형",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltbreach.png"
-    },
-
-    "ESFJ": {
-        "name": "ASTRA 🌌",
-        "desc": "팀 전체를 조율하는 전략가",
-        "role": "컨트롤러",
-        "skill": "우주 조작 ✨",
-        "tier": "💜 전략형",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltastra.png"
-    },
-
-    "ISTP": {
-        "name": "YORU 👺",
-        "desc": "혼자 침투하는 고독한 암살자",
-        "role": "듀얼리스트",
-        "skill": "차원 이동 🌌",
-        "tier": "💀 변수",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltyoru.png"
-    },
-
-    "ISFP": {
-        "name": "FADE 🌑",
-        "desc": "감각적으로 적을 추적하는 사냥꾼",
-        "role": "이니시에이터",
-        "skill": "악몽 추적 👁️",
-        "tier": "🌙 감각형",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltfade.png"
-    },
-
-    "ESTP": {
-        "name": "RAZE 💣",
-        "desc": "폭발적인 공격력의 러시형",
-        "role": "듀얼리스트",
-        "skill": "로켓 점프 🚀",
-        "tier": "🔥 공격형",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltraze.png"
-    },
-
-    "ESFP": {
-        "name": "NEON ⚡",
-        "desc": "초고속 러시로 게임을 찢는 스타",
-        "role": "듀얼리스트",
-        "skill": "스피드 대시 ⚡",
-        "tier": "🌟 캐리형",
-        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltneon.png"
-    }
-}
-
-# =========================================
-# UI
-# =========================================
-st.markdown("<div class='title'>🔫 MBTI VALORANT AGENT PICKER 🔫</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>🎯 당신의 플레이 스타일 에이전트는?</div>", unsafe_allow_html=True)
-
-mbti = st.selectbox("🎭 MBTI 선택", list(agents.keys()))
-
-if st.button("🔥 에이전트 소환!"):
-
-    with st.spinner("스파이크 사이트 연결 중... 🌐"):
-        time.sleep(2)
-
-    st.snow()
-
-    agent = agents[mbti]
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-
-    st.image(agent["img"], use_container_width=True)
-
-    st.markdown(f"# {agent['name']}")
-
-    st.markdown(f"<div class='rank'>{agent['tier']}</div>", unsafe_allow_html=True)
-
-    st.success(f"당신의 발로란트 에이전트는 {agent['name']}!")
-
-    st.markdown(f"""
-## 🧠 성향 분석
-{agent['desc']}
-
-## ⚔️ 대표 스킬
-{agent['skill']}
-
-## 🎮 포지션
-{agent['role']}
-""")
-
-    st.markdown("## 📊 능력치")
-
-    for stat in ["에임 🎯", "전략 🧠", "팀워크 🤝", "클러치 🔥"]:
-        st.progress(random.randint(60, 100))
-
-    st.markdown("## 🎲 오늘의 매치 운세")
-    st.info(random.choice([
-        "🔥 에임 각 미쳤습니다",
-        "💎 랭크 상승 가능성 높음",
-        "⚡ 클러치 게임 가능",
-        "😈 팀운은 모르지만 당신은 잘함"
-    ]))
-
-    st.markdown("## 💞 듀오 추천")
-    st.warning(random.choice(list(agents.keys())))
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-st.write("---")
-st.caption("Made with ❤️ using Streamlit | VALORANT MBTI Edition 🔫")
+print("====================")
