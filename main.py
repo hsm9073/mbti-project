@@ -6,13 +6,13 @@ import time
 # 페이지 설정
 # =========================================
 st.set_page_config(
-    page_title="🔥 MBTI 브롤스타즈 추천기 🔥",
-    page_icon="🎮",
+    page_title="🔫 MBTI VALORANT 에이전트 추천기 🔫",
+    page_icon="🎯",
     layout="centered"
 )
 
 # =========================================
-# CSS 디자인
+# CSS
 # =========================================
 st.markdown("""
 <style>
@@ -24,28 +24,30 @@ html, body, [class*="css"] {
 }
 
 .main {
-    background: linear-gradient(to bottom, #fff4e6, #ffe8f3);
+    background: linear-gradient(to bottom, #0f172a, #111827);
+    color: white;
 }
 
 .title {
     text-align:center;
     font-size:55px;
     font-weight:900;
-    color:#ff3d00;
+    color:#ff4655;
 }
 
 .subtitle {
     text-align:center;
     font-size:22px;
-    color:gray;
+    color:#cbd5e1;
     margin-bottom:30px;
 }
 
 .card {
-    background:white;
+    background:#111827;
     padding:30px;
     border-radius:25px;
-    box-shadow:0px 10px 30px rgba(0,0,0,0.15);
+    box-shadow:0px 10px 30px rgba(0,0,0,0.4);
+    color:white;
 }
 
 .stButton>button {
@@ -53,15 +55,23 @@ html, body, [class*="css"] {
     height:60px;
     border:none;
     border-radius:18px;
-    background:linear-gradient(to right,#ff512f,#dd2476);
+    background:linear-gradient(to right,#ff4655,#ff7a59);
     color:white;
     font-size:22px;
     font-weight:bold;
 }
 
 .stButton>button:hover {
-    background:linear-gradient(to right,#dd2476,#ff512f);
-    color:white;
+    background:linear-gradient(to right,#ff7a59,#ff4655);
+}
+
+.rank {
+    padding:10px;
+    border-radius:15px;
+    background:linear-gradient(to right,#ff4655,#ffcc00);
+    text-align:center;
+    font-weight:bold;
+    color:black;
 }
 
 .footer {
@@ -70,381 +80,214 @@ html, body, [class*="css"] {
     margin-top:50px;
 }
 
-.rank-box {
-    background:linear-gradient(to right,#f7971e,#ffd200);
-    padding:12px;
-    border-radius:15px;
-    text-align:center;
-    color:black;
-    font-weight:bold;
-    font-size:20px;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
 # =========================================
-# 브롤스타즈 데이터
+# 발로란트 데이터
 # =========================================
-brawlers = {
+agents = {
 
     "INTJ": {
-        "name": "스파이크 🌵",
-        "desc": "조용하지만 엄청 강력한 전략가 타입!",
-        "weapon": "가시 폭탄 💥",
-        "rank": "👑 전설",
-        "color": "💚 초록",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000006.png"
+        "name": "CHAMBER 🕶️",
+        "desc": "완벽한 계산형 킬러, 한 발로 끝내는 전략가",
+        "role": "센티넬",
+        "skill": "헤드헌터 🔫",
+        "tier": "👑 프로픽",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltb3b1c3f0c2f7b2a3/Chamber.png"
     },
 
     "INTP": {
-        "name": "바이런 🧪",
-        "desc": "분석적이고 지능적인 브레인 타입!",
-        "weapon": "독약 샷 ☠️",
-        "rank": "💎 신화",
-        "color": "💜 보라",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000088.png"
+        "name": "KILLJOY 🤖",
+        "desc": "기계처럼 분석하고 설계하는 방어 천재",
+        "role": "센티넬",
+        "skill": "나노스웜 💣",
+        "tier": "💎 전략형",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltb3a3f0c2f7b2a3/Killjoy.png"
     },
 
     "ENTJ": {
-        "name": "팽 🥊",
-        "desc": "카리스마 넘치는 리더형 브롤러!",
-        "weapon": "킥 어택 👟",
-        "rank": "🔥 크로마틱",
-        "color": "❤️ 빨강",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000092.png"
+        "name": "BRIMSTONE 🔥",
+        "desc": "팀을 지휘하는 완벽한 리더",
+        "role": "컨트롤러",
+        "skill": "궤도폭격 ☄️",
+        "tier": "🔥 지휘관",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltbrimstone.png"
     },
 
     "ENTP": {
-        "name": "체스터 🎭",
-        "desc": "장난기 많고 예측 불가능한 타입!",
-        "weapon": "랜덤 궁극기 🎲",
-        "rank": "🌈 전설",
-        "color": "🩷 핑크",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000100.png"
+        "name": "JETT 🌪️",
+        "desc": "예측 불가, 자유로운 공격 스타일",
+        "role": "듀얼리스트",
+        "skill": "칼날 대시 ⚡",
+        "tier": "💀 캐리형",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltjett.png"
     },
 
     "INFJ": {
-        "name": "샌디 😴",
-        "desc": "신비롭고 조용한 감성 브롤러!",
-        "weapon": "모래 폭풍 🌪️",
-        "rank": "🌙 전설",
-        "color": "💛 노랑",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000052.png"
+        "name": "SAGE 💚",
+        "desc": "팀을 살리는 조용한 수호자",
+        "role": "센티넬",
+        "skill": "부활 ✨",
+        "tier": "💖 필수픽",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltsage.png"
     },
 
     "INFP": {
-        "name": "코델리우스 🍄",
-        "desc": "몽환적이고 상상력 넘치는 타입!",
-        "weapon": "버섯 공격 🍄",
-        "rank": "💎 신화",
-        "color": "💚 연두",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000111.png"
+        "name": "REYNA 💜",
+        "desc": "감정 기반 캐리형 솔로 플레이어",
+        "role": "듀얼리스트",
+        "skill": "영혼흡수 👁️",
+        "tier": "🌈 하이리스크",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltreyna.png"
     },
 
     "ENFJ": {
-        "name": "포코 🎸",
-        "desc": "사람들을 행복하게 만드는 분위기 메이커!",
-        "weapon": "뮤직 웨이브 🎵",
-        "rank": "🎶 에픽",
-        "color": "💜 보라",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000014.png"
+        "name": "SKYE 🌿",
+        "desc": "팀을 치유하고 이끄는 리더형 서포터",
+        "role": "이니시에이터",
+        "skill": "힐링 토템 🐺",
+        "tier": "💚 팀버프",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltskye.png"
     },
 
     "ENFP": {
-        "name": "레온 🦎",
-        "desc": "자유롭고 에너지 넘치는 인기쟁이!",
-        "weapon": "스핀 블레이드 ⚡",
-        "rank": "👑 전설",
-        "color": "💚 초록",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000023.png"
+        "name": "PHOENIX 🔥",
+        "desc": "불같은 에너지, 혼자도 팀도 캐리",
+        "role": "듀얼리스트",
+        "skill": "리바이브 🔥",
+        "tier": "⚡ 인기픽",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltphoenix.png"
     },
 
     "ISTJ": {
-        "name": "샘 🔧",
-        "desc": "묵묵하고 책임감 있는 브롤러!",
-        "weapon": "너클 펀치 👊",
-        "rank": "⚙️ 에픽",
-        "color": "🩶 회색",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000098.png"
+        "name": "CYpher 🕵️",
+        "desc": "정보를 완벽히 통제하는 분석가",
+        "role": "센티넬",
+        "skill": "트랩 와이어 🪤",
+        "tier": "🧠 정보형",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltcypher.png"
     },
 
     "ISFJ": {
-        "name": "팸 🔩",
-        "desc": "팀을 지켜주는 든든한 힐러!",
-        "weapon": "스크랩 공격 🔧",
-        "rank": "💖 영웅",
-        "color": "🩷 핑크",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000038.png"
+        "name": "SOVA 🏹",
+        "desc": "팀을 위해 정보를 수집하는 지원형",
+        "role": "이니시에이터",
+        "skill": "정찰 화살 🎯",
+        "tier": "💙 서포트",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltsova.png"
     },
 
     "ESTJ": {
-        "name": "불 🔥",
-        "desc": "강력한 추진력의 돌격대장!",
-        "weapon": "샷건 폭발 💣",
-        "rank": "🔥 초희귀",
-        "color": "❤️ 빨강",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000002.png"
+        "name": "BREACH 💥",
+        "desc": "강력한 진입형 파괴자",
+        "role": "이니시에이터",
+        "skill": "지진 충격 🌋",
+        "tier": "🔥 돌격형",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltbreach.png"
     },
 
     "ESFJ": {
-        "name": "재키 ⛏️",
-        "desc": "친화력 최고! 팀워크 장인!",
-        "weapon": "지진 공격 🌍",
-        "rank": "💛 초희귀",
-        "color": "🧡 주황",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000058.png"
+        "name": "ASTRA 🌌",
+        "desc": "팀 전체를 조율하는 전략가",
+        "role": "컨트롤러",
+        "skill": "우주 조작 ✨",
+        "tier": "💜 전략형",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltastra.png"
     },
 
     "ISTP": {
-        "name": "에드거 🧣",
-        "desc": "쿨하고 혼자 싸우는 암살자 스타일!",
-        "weapon": "초고속 펀치 ⚡",
-        "rank": "🌑 영웅",
-        "color": "🖤 검정",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000080.png"
+        "name": "YORU 👺",
+        "desc": "혼자 침투하는 고독한 암살자",
+        "role": "듀얼리스트",
+        "skill": "차원 이동 🌌",
+        "tier": "💀 변수",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltyoru.png"
     },
 
     "ISFP": {
-        "name": "재닛 🎤",
-        "desc": "감성적이고 자유로운 아티스트 타입!",
-        "weapon": "음파 공격 🎶",
-        "rank": "🌈 크로마틱",
-        "color": "💖 핑크",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000091.png"
+        "name": "FADE 🌑",
+        "desc": "감각적으로 적을 추적하는 사냥꾼",
+        "role": "이니시에이터",
+        "skill": "악몽 추적 👁️",
+        "tier": "🌙 감각형",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltfade.png"
     },
 
     "ESTP": {
-        "name": "팽 🥋",
-        "desc": "스릴을 즐기는 액션파 브롤러!",
-        "weapon": "연속 킥 🔥",
-        "rank": "🔥 크로마틱",
-        "color": "❤️ 빨강",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000092.png"
+        "name": "RAZE 💣",
+        "desc": "폭발적인 공격력의 러시형",
+        "role": "듀얼리스트",
+        "skill": "로켓 점프 🚀",
+        "tier": "🔥 공격형",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltraze.png"
     },
 
     "ESFP": {
-        "name": "멜로디 🎧",
-        "desc": "화려하고 주목받는 슈퍼스타!",
-        "weapon": "뮤직 어택 🎵",
-        "rank": "🌟 신화",
-        "color": "💜 보라",
-        "img": "https://cdn.brawlify.com/brawlers/borderless/16000119.png"
+        "name": "NEON ⚡",
+        "desc": "초고속 러시로 게임을 찢는 스타",
+        "role": "듀얼리스트",
+        "skill": "스피드 대시 ⚡",
+        "tier": "🌟 캐리형",
+        "img": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/bltneon.png"
     }
 }
 
 # =========================================
-# 제목
+# UI
 # =========================================
-st.markdown("<div class='title'>🔥 MBTI 브롤스타즈 추천기 🔥</div>", unsafe_allow_html=True)
+st.markdown("<div class='title'>🔫 MBTI VALORANT AGENT PICKER 🔫</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>🎯 당신의 플레이 스타일 에이전트는?</div>", unsafe_allow_html=True)
 
-st.markdown("<div class='subtitle'>🎮 당신과 가장 잘 어울리는 브롤러를 찾아보세요!</div>", unsafe_allow_html=True)
+mbti = st.selectbox("🎭 MBTI 선택", list(agents.keys()))
 
-# =========================================
-# 사이드바
-# =========================================
-with st.sidebar:
+if st.button("🔥 에이전트 소환!"):
 
-    st.header("🌟 메뉴")
-
-    st.write("🎭 MBTI 브롤러 분석")
-    st.write("⚔️ 전투 능력치")
-    st.write("🏆 브롤러 등급")
-    st.write("🎲 오늘의 운세")
-    st.write("🔥 스타 플레이어 테스트")
-
-    st.write("---")
-
-    mood = st.selectbox(
-        "💭 현재 기분은?",
-        ["😆 신남", "😴 피곤", "🔥 의욕 MAX", "🥰 행복"]
-    )
-
-    if mood == "😆 신남":
-        st.success("오늘은 레온처럼 날아다닐 기세 ⚡")
-
-    elif mood == "😴 피곤":
-        st.info("샌디처럼 조금 쉬어가요 😴")
-
-    elif mood == "🔥 의욕 MAX":
-        st.warning("오늘 당신의 승률 폭발 예정 🔥")
-
-    else:
-        st.balloons()
-
-# =========================================
-# MBTI 선택
-# =========================================
-mbti = st.selectbox(
-    "🎭 당신의 MBTI를 선택하세요!",
-    list(brawlers.keys())
-)
-
-# =========================================
-# 결과 버튼
-# =========================================
-if st.button("🔥 브롤러 소환하기!"):
-
-    with st.spinner("브롤스타즈 서버 접속 중... 🎮"):
+    with st.spinner("스파이크 사이트 연결 중... 🌐"):
         time.sleep(2)
 
     st.snow()
 
-    result = brawlers[mbti]
+    agent = agents[mbti]
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
 
-    st.image(result["img"], width=300)
+    st.image(agent["img"], use_container_width=True)
 
-    st.markdown(f"# {result['name']}")
+    st.markdown(f"# {agent['name']}")
 
-    st.markdown(
-        f"<div class='rank-box'>{result['rank']}</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown(f"<div class='rank'>{agent['tier']}</div>", unsafe_allow_html=True)
 
-    st.success(
-        f"✨ 당신과 가장 잘 어울리는 브롤러는 {result['name']} 입니다!"
-    )
+    st.success(f"당신의 발로란트 에이전트는 {agent['name']}!")
 
     st.markdown(f"""
-## 💬 성격 분석
+## 🧠 성향 분석
+{agent['desc']}
 
-{result['desc']}
+## ⚔️ 대표 스킬
+{agent['skill']}
 
----
-
-## ⚔️ 대표 공격
-
-{result['weapon']}
-
----
-
-## 🎨 에너지 컬러
-
-{result['color']}
+## 🎮 포지션
+{agent['role']}
 """)
 
-    # =========================================
-    # 능력치
-    # =========================================
-    st.markdown("## 📊 브롤러 능력치")
+    st.markdown("## 📊 능력치")
 
-    hp = random.randint(70, 100)
-    attack = random.randint(70, 100)
-    defense = random.randint(70, 100)
-    speed = random.randint(70, 100)
-    aim = random.randint(70, 100)
-    teamwork = random.randint(70, 100)
+    for stat in ["에임 🎯", "전략 🧠", "팀워크 🤝", "클러치 🔥"]:
+        st.progress(random.randint(60, 100))
 
-    st.write("❤️ 체력")
-    st.progress(hp)
+    st.markdown("## 🎲 오늘의 매치 운세")
+    st.info(random.choice([
+        "🔥 에임 각 미쳤습니다",
+        "💎 랭크 상승 가능성 높음",
+        "⚡ 클러치 게임 가능",
+        "😈 팀운은 모르지만 당신은 잘함"
+    ]))
 
-    st.write("⚔️ 공격력")
-    st.progress(attack)
-
-    st.write("🛡️ 방어력")
-    st.progress(defense)
-
-    st.write("⚡ 스피드")
-    st.progress(speed)
-
-    st.write("🎯 에임")
-    st.progress(aim)
-
-    st.write("🤝 팀워크")
-    st.progress(teamwork)
-
-    # =========================================
-    # 티어
-    # =========================================
-    tier = random.choice([
-        "🏆 S 티어",
-        "🔥 OP 티어",
-        "⚡ A 티어",
-        "💎 메타 브롤러",
-        "👑 전설급"
-    ])
-
-    st.markdown("## 🌟 현재 메타 티어")
-    st.info(tier)
-
-    # =========================================
-    # 운세
-    # =========================================
-    st.markdown("## 🎲 오늘의 브롤 운세")
-
-    fortunes = [
-
-        "🍀 오늘은 트로피 폭등 예정!",
-        "🔥 연승 모드 발동!",
-        "⚡ 스타 플레이어 가능성 UP!",
-        "🎁 전설 브롤러 뽑을 운세!",
-        "💎 오늘 운이 엄청 좋습니다!"
-    ]
-
-    st.success(random.choice(fortunes))
-
-    # =========================================
-    # 궁합
-    # =========================================
-    st.markdown("## 💞 최고의 듀오 궁합")
-
-    duo = random.choice([
-        "쉘리 🤠",
-        "콜트 🔫",
-        "스파이크 🌵",
-        "레온 🦎",
-        "멜로디 🎧",
-        "팽 🥊"
-    ])
-
-    st.warning(f"당신과 최고의 듀오 브롤러는 {duo}")
-
-    # =========================================
-    # 명언
-    # =========================================
-    st.markdown("## 🌈 브롤 명언")
-
-    quotes = [
-
-        "🔥 패배는 다음 승리의 경험치!",
-        "⚡ 오늘도 브롤러답게 싸워라!",
-        "🎮 진짜 고수는 끝까지 포기하지 않는다!",
-        "🏆 스타 플레이어는 바로 당신!",
-        "💥 실력도 중요하지만 즐기는 게 최고!"
-    ]
-
-    st.info(random.choice(quotes))
-
-    # =========================================
-    # 최종 메시지
-    # =========================================
-    st.write("")
-    st.write("---")
-
-    st.markdown("""
-# 🎉 분석 완료!
-
-당신은 브롤스타즈 세계에서도 특별한 브롤러입니다 🔥  
-오늘도 승리를 향해 돌진하세요 ⚡
-""")
+    st.markdown("## 💞 듀오 추천")
+    st.warning(random.choice(list(agents.keys())))
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# =========================================
-# 하단
-# =========================================
-st.write("")
 st.write("---")
-
-st.markdown("""
-<div class='footer'>
-
-🎮 MBTI Brawl Stars Universe  
-Made with ❤️ using Streamlit
-
-🔥 MBTI + Brawl Stars = PERFECT 🔥
-
-</div>
-""", unsafe_allow_html=True)
+st.caption("Made with ❤️ using Streamlit | VALORANT MBTI Edition 🔫")
