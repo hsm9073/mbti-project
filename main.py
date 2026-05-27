@@ -1,299 +1,404 @@
 import streamlit as st
 import random
+import time
 
-# =========================
-# 페이지 기본 설정
-# =========================
+# =========================================
+# 페이지 설정
+# =========================================
 st.set_page_config(
-    page_title="MBTI 포켓몬 추천기 🎮",
+    page_title="✨ MBTI Pokémon Universe ✨",
     page_icon="⚡",
     layout="centered"
 )
 
-# =========================
+# =========================================
 # 커스텀 CSS
-# =========================
+# =========================================
 st.markdown("""
 <style>
-.main {
-    background: linear-gradient(to bottom, #fff7f0, #ffeef8);
+
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Pretendard', sans-serif;
 }
 
-h1, h2, h3 {
+.main {
+    background: linear-gradient(to bottom, #fff5f7, #eef7ff);
+}
+
+.title {
     text-align: center;
+    font-size: 55px;
+    font-weight: 800;
+    color: #ff4b6e;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 22px;
+    color: gray;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.type-box {
+    padding: 10px;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: bold;
+    background: linear-gradient(to right, #ffe259, #ffa751);
+    color: black;
+}
+
+.power-box {
+    background: #f4f4f4;
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 10px;
+}
+
+.footer {
+    text-align: center;
+    color: gray;
+    margin-top: 50px;
+    font-size: 14px;
 }
 
 .stButton>button {
-    background-color: #ffcc00;
-    color: black;
+    width: 100%;
+    background: linear-gradient(to right, #ff512f, #dd2476);
+    color: white;
     border-radius: 15px;
     border: none;
-    padding: 10px 25px;
-    font-size: 18px;
+    height: 55px;
+    font-size: 20px;
     font-weight: bold;
 }
 
 .stButton>button:hover {
-    background-color: #ffaa00;
+    background: linear-gradient(to right, #dd2476, #ff512f);
     color: white;
 }
 
-.result-box {
-    padding: 20px;
-    border-radius: 20px;
-    background-color: white;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
-}
 </style>
 """, unsafe_allow_html=True)
 
-# =========================
-# MBTI 데이터
-# =========================
+# =========================================
+# 포켓몬 데이터
+# =========================================
 pokemon_data = {
 
     "INTJ": {
         "pokemon": "뮤츠 🧬",
         "type": "에스퍼 🔮",
-        "desc": "전략적이고 독립적인 당신은 강력한 카리스마를 가진 뮤츠와 닮았어요!",
-        "strength": "분석력 / 리더십 / 집중력",
-        "color": "보라색 💜",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png"
+        "desc": "전략적이고 독립적인 완벽주의자!",
+        "skill": "사이코 브레이크 💥",
+        "color": "💜 보라색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png"
     },
 
     "INTP": {
         "pokemon": "후딘 🔮",
         "type": "에스퍼 🧠",
-        "desc": "논리적이고 호기심 많은 당신은 천재 포켓몬 후딘 타입!",
-        "strength": "창의력 / 분석력 / 아이디어",
-        "color": "노란색 💛",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/65.png"
+        "desc": "논리적이고 분석적인 천재!",
+        "skill": "염동력 ✨",
+        "color": "💛 노란색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/65.png"
     },
 
     "ENTJ": {
         "pokemon": "리자몽 🔥",
         "type": "불꽃 🔥",
-        "desc": "카리스마 넘치는 리더! 모두를 이끄는 리자몽 스타일!",
-        "strength": "추진력 / 리더십 / 자신감",
-        "color": "주황색 🧡",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png"
+        "desc": "강력한 리더십과 카리스마!",
+        "skill": "화염방사 🔥",
+        "color": "🧡 주황색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png"
     },
 
     "ENTP": {
         "pokemon": "팬텀 👻",
         "type": "고스트 👻",
-        "desc": "장난기 많고 창의적인 당신은 팬텀처럼 독특한 매력쟁이!",
-        "strength": "아이디어 / 재치 / 유머",
-        "color": "보라색 💜",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png"
+        "desc": "창의적이고 장난기 가득!",
+        "skill": "섀도볼 🌑",
+        "color": "💜 보라색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png"
     },
 
     "INFJ": {
         "pokemon": "루기아 🌊",
-        "type": "에스퍼 🌊",
-        "desc": "신비롭고 깊은 통찰력을 가진 당신은 전설의 루기아 타입!",
-        "strength": "직관 / 공감 / 통찰력",
-        "color": "하늘색 💙",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/249.png"
+        "type": "전설 🌊",
+        "desc": "깊은 통찰력과 신비로운 분위기!",
+        "skill": "에어로블라스트 🌪️",
+        "color": "💙 하늘색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/249.png"
     },
 
     "INFP": {
         "pokemon": "이브이 🌸",
         "type": "노말 🌈",
-        "desc": "감성적이고 따뜻한 당신은 무한한 가능성의 이브이!",
-        "strength": "감성 / 배려 / 상상력",
-        "color": "핑크 🩷",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png"
+        "desc": "따뜻하고 감성적인 힐링러!",
+        "skill": "애교부리기 💖",
+        "color": "🩷 핑크색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png"
     },
 
     "ENFJ": {
         "pokemon": "가디안 💖",
         "type": "페어리 ✨",
-        "desc": "사람들을 챙기고 이끄는 당신은 가디안 같은 존재!",
-        "strength": "배려 / 소통 / 리더십",
-        "color": "초록색 💚",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/282.png"
+        "desc": "사람들을 이끄는 따뜻한 리더!",
+        "skill": "문포스 🌙",
+        "color": "💚 초록색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/282.png"
     },
 
     "ENFP": {
         "pokemon": "피카츄 ⚡",
         "type": "전기 ⚡",
-        "desc": "밝고 사랑스러운 인기쟁이! 피카츄와 찰떡!",
-        "strength": "에너지 / 친화력 / 열정",
-        "color": "노란색 💛",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
+        "desc": "밝고 사랑스러운 인기쟁이!",
+        "skill": "100만볼트 ⚡",
+        "color": "💛 노란색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"
     },
 
     "ISTJ": {
         "pokemon": "강철톤 ⛓️",
         "type": "강철 ⚙️",
-        "desc": "묵묵하고 책임감 강한 당신은 강철톤처럼 든든해요!",
-        "strength": "책임감 / 신뢰 / 성실함",
-        "color": "회색 🩶",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/208.png"
+        "desc": "믿음직하고 책임감 있는 타입!",
+        "skill": "아이언테일 ⛓️",
+        "color": "🩶 회색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/208.png"
     },
 
     "ISFJ": {
         "pokemon": "해피너스 🩷",
         "type": "노말 🌸",
-        "desc": "배려심 넘치는 당신은 모두를 행복하게 만드는 해피너스!",
-        "strength": "친절 / 공감 / 안정감",
-        "color": "핑크 🩷",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/242.png"
+        "desc": "배려심 넘치는 천사 타입!",
+        "skill": "치유의파동 ✨",
+        "color": "🩷 핑크색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/242.png"
     },
 
     "ESTJ": {
         "pokemon": "보스로라 ⚙️",
-        "type": "강철 ⛓️",
-        "desc": "추진력과 책임감이 강한 당신은 보스로라 타입!",
-        "strength": "통솔력 / 실행력 / 현실감각",
-        "color": "은색 🤍",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/306.png"
+        "type": "강철 🛡️",
+        "desc": "추진력 강한 현실주의자!",
+        "skill": "메탈버스트 ⚡",
+        "color": "🤍 은색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/306.png"
     },
 
     "ESFJ": {
         "pokemon": "픽시 🌙",
         "type": "페어리 🌸",
-        "desc": "친절하고 따뜻한 분위기의 당신은 픽시와 닮았어요!",
-        "strength": "사교성 / 배려 / 친근함",
-        "color": "연핑크 🌸",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/36.png"
+        "desc": "친절하고 따뜻한 분위기 메이커!",
+        "skill": "코멧펀치 ☄️",
+        "color": "🌸 연핑크",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/36.png"
     },
 
     "ISTP": {
         "pokemon": "한카리아스 🦈",
         "type": "드래곤 🐉",
-        "desc": "조용하지만 강력한 행동파! 한카리아스 스타일!",
-        "strength": "도전정신 / 집중력 / 침착함",
-        "color": "남색 💙",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/445.png"
+        "desc": "조용하지만 강력한 행동파!",
+        "skill": "드래곤클로 🐲",
+        "color": "💙 남색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/445.png"
     },
 
     "ISFP": {
         "pokemon": "라프라스 ❄️",
         "type": "물 💧",
-        "desc": "온화하고 감성적인 자유로운 영혼! 라프라스 타입!",
-        "strength": "감수성 / 자유로움 / 따뜻함",
-        "color": "하늘색 💎",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png"
+        "desc": "감성적이고 자유로운 영혼!",
+        "skill": "하이드로펌프 🌊",
+        "color": "💎 하늘색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/131.png"
     },
 
     "ESTP": {
         "pokemon": "번치코 🥊",
         "type": "불꽃 🔥",
-        "desc": "열정 넘치고 스릴을 즐기는 당신은 번치코 스타일!",
-        "strength": "도전 / 자신감 / 에너지",
-        "color": "빨간색 ❤️",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/257.png"
+        "desc": "열정 넘치는 액션파!",
+        "skill": "블레이즈킥 👟",
+        "color": "❤️ 빨간색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/257.png"
     },
 
     "ESFP": {
         "pokemon": "푸린 🎤",
         "type": "노말 🎵",
-        "desc": "사람들을 즐겁게 만드는 분위기 메이커! 푸린 타입!",
-        "strength": "매력 / 밝음 / 친화력",
-        "color": "핑크 🌸",
-        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png"
+        "desc": "사람들을 행복하게 만드는 엔터테이너!",
+        "skill": "노래하기 🎶",
+        "color": "🌸 핑크색",
+        "img": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/39.png"
     }
 }
 
-# =========================
+# =========================================
 # 제목
-# =========================
-st.title("🎮 MBTI 포켓몬 추천기")
-st.markdown("## ✨ 당신과 가장 잘 어울리는 포켓몬은?!")
-st.write("")
+# =========================================
+st.markdown("<div class='title'>🎮 MBTI Pokémon Universe</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>✨ 당신의 영혼과 연결된 포켓몬을 찾아보세요 ✨</div>", unsafe_allow_html=True)
 
-# =========================
-# 설명
-# =========================
-st.info("""
-💡 사용 방법
+# =========================================
+# 사이드바
+# =========================================
+with st.sidebar:
 
-1️⃣ 자신의 MBTI를 선택하세요  
-2️⃣ 버튼을 눌러 결과를 확인하세요  
-3️⃣ 당신의 성격과 닮은 포켓몬을 만나보세요!
-""")
+    st.header("🌟 메뉴")
 
-# =========================
+    st.write("🎭 MBTI 기반 포켓몬 추천")
+    st.write("⚡ 랜덤 능력치 분석")
+    st.write("💖 궁합 MBTI 확인")
+    st.write("🎲 오늘의 운세")
+    st.write("🏆 전설 등급 테스트")
+
+    st.write("---")
+
+    st.subheader("🎵 오늘의 기분")
+
+    mood = st.radio(
+        "현재 기분은?",
+        ["😆 신남", "😴 피곤", "🥰 행복", "🔥 의욕 MAX"]
+    )
+
+    if mood == "😆 신남":
+        st.success("오늘은 피카츄처럼 에너지 폭발 ⚡")
+
+    elif mood == "😴 피곤":
+        st.info("잠만보와 함께 쉬어가요 😴")
+
+    elif mood == "🥰 행복":
+        st.balloons()
+
+    else:
+        st.warning("오늘 당신의 열정이 불타오른다 🔥")
+
+# =========================================
 # MBTI 선택
-# =========================
+# =========================================
 mbti = st.selectbox(
     "🎭 당신의 MBTI를 선택하세요!",
     list(pokemon_data.keys())
 )
 
-# =========================
+# =========================================
 # 버튼
-# =========================
-if st.button("⚡ 결과 확인하기!"):
+# =========================================
+if st.button("⚡ 포켓몬 소환하기!"):
+
+    # 로딩 연출
+    with st.spinner("포켓몬 세계와 연결 중... 🌌"):
+
+        time.sleep(2)
+
+    st.snow()
 
     result = pokemon_data[mbti]
 
-    st.balloons()
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
 
-    st.write("")
-    st.write("")
+    st.image(result["img"], width=300)
+
+    st.markdown(f"# {result['pokemon']}")
 
     st.markdown(
-        "<div class='result-box'>",
+        f"<div class='type-box'>{result['type']}</div>",
         unsafe_allow_html=True
     )
 
-    st.image(
-        result["img"],
-        width=250
-    )
+    st.write("")
 
-    st.success(
-        f"🎉 당신과 가장 잘 어울리는 포켓몬은 {result['pokemon']} 입니다!"
-    )
+    st.success(f"✨ 당신과 가장 잘 어울리는 포켓몬은 {result['pokemon']} 입니다!")
 
     st.markdown(f"""
-### 📌 포켓몬 타입
-{result['type']}
+## 💬 성격 설명
 
-### 💬 성격 설명
 {result['desc']}
 
-### 🌟 당신의 강점
-{result['strength']}
+---
 
-### 🎨 당신의 에너지 컬러
+## ⚔️ 대표 기술
+
+{result['skill']}
+
+---
+
+## 🎨 당신의 에너지 컬러
+
 {result['color']}
 """)
 
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True
-    )
+    # =========================================
+    # 능력치
+    # =========================================
+    st.markdown("## 📊 능력치 분석")
 
-    # 랜덤 명언
-    quotes = [
+    hp = random.randint(70, 100)
+    attack = random.randint(70, 100)
+    defense = random.randint(70, 100)
+    speed = random.randint(70, 100)
+    iq = random.randint(70, 100)
+    charm = random.randint(70, 100)
 
-        "포켓몬 마스터의 길은 오늘도 계속된다 🚀",
-        "당신의 매력은 이미 전설급 ✨",
-        "피카츄도 반할 성격이에요 ⚡",
-        "오늘도 귀엽게 힘내봐요 🌈",
-        "당신만의 특별한 능력을 믿어보세요 💖",
-        "오늘의 행운 포켓몬이 당신과 함께합니다 🍀",
-        "당신의 MBTI 에너지가 폭발 중 🔥",
-        "행복은 포켓몬처럼 가까이에 있어요 🎈",
-        "당신은 이미 최고의 트레이너 😎",
-        "오늘도 반짝반짝 빛나는 하루 ✨"
+    st.write("❤️ 체력")
+    st.progress(hp)
 
-    ]
+    st.write("⚔️ 공격력")
+    st.progress(attack)
 
-    st.write("")
-    st.markdown("## 🌟 오늘의 한마디")
-    st.info(random.choice(quotes))
+    st.write("🛡️ 방어력")
+    st.progress(defense)
 
-    # 궁합 추천
-    st.write("")
-    st.markdown("## 💞 잘 맞는 MBTI")
+    st.write("⚡ 스피드")
+    st.progress(speed)
 
+    st.write("🧠 지능")
+    st.progress(iq)
+
+    st.write("💖 매력")
+    st.progress(charm)
+
+    # =========================================
+    # 희귀도
+    # =========================================
+    rarity = random.choice([
+        "🌟 일반",
+        "💎 레어",
+        "👑 에픽",
+        "🔥 전설",
+        "🌈 신화"
+    ])
+
+    st.markdown("## 🏆 당신의 희귀도")
+    st.info(rarity)
+
+    # =========================================
+    # 오늘의 운세
+    # =========================================
+    fortune = random.choice([
+        "🍀 엄청난 행운이 찾아옵니다!",
+        "💖 새로운 인연이 생길지도 몰라요!",
+        "⚡ 오늘은 도전하면 성공 확률 UP!",
+        "🎁 깜짝 선물이 기다리고 있어요!",
+        "🌈 행복한 일이 가득한 하루!"
+    ])
+
+    st.markdown("## 🎲 오늘의 운세")
+    st.success(fortune)
+
+    # =========================================
+    # 궁합
+    # =========================================
     compatibility = {
-        "INTJ": "ENFP 💛",
+        "INTJ": "ENFP ⚡",
         "INTP": "ENTJ 🔥",
         "ENTJ": "INFP 🌸",
         "ENTP": "INFJ 🌊",
@@ -311,79 +416,70 @@ if st.button("⚡ 결과 확인하기!"):
         "ESFP": "ISTJ ⛓️"
     }
 
-    st.success(
-        f"💘 당신과 잘 맞는 MBTI는 {compatibility[mbti]} 입니다!"
+    st.markdown("## 💞 최고의 MBTI 궁합")
+
+    st.warning(
+        f"당신과 최고의 궁합은 {compatibility[mbti]} 입니다!"
     )
 
-    # 퍼센트 바
-    st.write("")
-    st.markdown("## 📊 포켓몬 싱크로율")
-
-    sync = random.randint(80, 100)
-
-    st.progress(sync)
-
-    st.write(f"✨ 싱크로율: {sync}%")
-
-    # 랜덤 능력치
-    st.write("")
-    st.markdown("## ⚔️ 당신의 능력치")
-
-    power = random.randint(70, 100)
-    speed = random.randint(70, 100)
-    intelligence = random.randint(70, 100)
-    charm = random.randint(70, 100)
-
-    st.write(f"💪 힘: {power}")
-    st.write(f"⚡ 스피드: {speed}")
-    st.write(f"🧠 지능: {intelligence}")
-    st.write(f"💖 매력: {charm}")
-
-    # 타입 궁합
-    st.write("")
-    st.markdown("## 🌈 추천 포켓몬 타입")
-
-    type_quotes = [
-        "🔥 불꽃 타입 — 열정 넘치는 스타일!",
-        "💧 물 타입 — 부드럽고 차분한 스타일!",
-        "⚡ 전기 타입 — 활발하고 에너지 넘치는 스타일!",
-        "🌿 풀 타입 — 따뜻하고 힐링되는 스타일!",
-        "❄️ 얼음 타입 — 조용하지만 깊은 매력!",
-        "👻 고스트 타입 — 신비로운 분위기!"
+    # =========================================
+    # 랜덤 포켓몬 친구
+    # =========================================
+    friends = [
+        "꼬부기 💧",
+        "이상해씨 🌿",
+        "파이리 🔥",
+        "토게피 🥚",
+        "냐옹 😺",
+        "잠만보 😴"
     ]
 
-    st.warning(random.choice(type_quotes))
+    st.markdown("## 🧸 당신의 포켓몬 친구")
 
-    # 재미 요소
-    st.write("")
-    st.markdown("## 🎲 오늘의 랜덤 운세")
+    st.info(random.choice(friends))
 
-    fortunes = [
-
-        "🍀 오늘은 아주 운이 좋은 날!",
-        "🎁 깜짝 행복이 찾아올지도?!",
-        "⚡ 예상치 못한 좋은 일이 생겨요!",
-        "🌈 웃을 일이 가득한 하루!",
-        "💖 새로운 인연이 찾아올 가능성 UP!",
-        "🔥 도전하면 성공 확률 상승!",
-        "🎵 기분 좋은 하루가 될 예정!",
-        "🌟 당신의 매력이 빛나는 하루!"
-
+    # =========================================
+    # 한줄 명언
+    # =========================================
+    quotes = [
+        "✨ 당신의 가능성은 무한합니다!",
+        "⚡ 오늘도 반짝반짝 빛나는 하루!",
+        "🔥 포기하지 않는 당신은 이미 챔피언!",
+        "🌈 당신만의 특별한 매력을 믿어보세요!",
+        "🎮 인생은 모험! 오늘도 레벨업!"
     ]
 
-    st.success(random.choice(fortunes))
+    st.markdown("## 🌟 오늘의 한마디")
+    st.success(random.choice(quotes))
 
-# =========================
-# 하단 꾸미기
-# =========================
+    # =========================================
+    # 최종 메시지
+    # =========================================
+    st.write("")
+    st.write("---")
+
+    st.markdown("""
+# 🎉 분석 완료!
+
+당신은 포켓몬 세계에서도 특별한 존재입니다 ✨  
+오늘도 자신만의 매력을 믿고 앞으로 나아가세요 🌈
+""")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================================
+# 하단
+# =========================================
 st.write("")
 st.write("---")
 
 st.markdown("""
-<div style='text-align:center;'>
+<div class='footer'>
 
-🎮 Made with ❤️ using Streamlit  
-✨ MBTI + Pokémon = 최고의 조합 ✨
+🎮 MBTI Pokémon Universe  
+Made with ❤️ using Streamlit
+
+✨ Pokémon + MBTI + Emotion = Perfect ✨
 
 </div>
 """, unsafe_allow_html=True)
